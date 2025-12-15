@@ -9,8 +9,8 @@
     "test": "ng test",
     "generate:api": "npm run generate:product && npm run generate:inventory && npm run generate:supplier && npm run generate:notification",
     "generate:product": "openapi-generator-cli generate -i http://localhost:8081/v3/api-docs -g typescript-angular -o src/app/api/product --additional-properties=ngVersion=21.0.5,npmName=product-api,snapshot=false,withInterfaces=true",
-    "generate:inventory": "openapi-generator-cli generate -i http://localhost:8082/v3/api-docs -g typescript-angular -o src/app/api/inventory --additional-properties=ngVersion=21.0.5,npmName=inventory-api,snapshot=false,withInterfaces=true",
-    "generate:supplier": "openapi-generator-cli generate -i http://localhost:8083/v3/api-docs -g typescript-angular -o src/app/api/supplier --additional-properties=ngVersion=21.0.5,npmName=supplier-api,snapshot=false,withInterfaces=true",
+    "generate:inventory": "openapi-generator-cli generate -i http://localhost:8083/v3/api-docs -g typescript-angular -o src/app/api/inventory --additional-properties=ngVersion=21.0.5,npmName=inventory-api,snapshot=false,withInterfaces=true",
+    "generate:supplier": "openapi-generator-cli generate -i http://localhost:8082/v3/api-docs -g typescript-angular -o src/app/api/supplier --additional-properties=ngVersion=21.0.5,npmName=supplier-api,snapshot=false,withInterfaces=true",
     "generate:notification": "openapi-generator-cli generate -i http://localhost:8084/v3/api-docs -g typescript-angular -o src/app/api/notification --additional-properties=ngVersion=21.0.5,npmName=notification-api,snapshot=false,withInterfaces=true"
   },
   "prettier": {

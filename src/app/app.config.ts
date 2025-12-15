@@ -2,8 +2,9 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
-import { API_CONFIGURATION, apiConfigFactory } from './core/api.config';
+import { apiConfigFactory } from './core/api.config';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { Configuration } from './api/product';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +14,7 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([authInterceptor])
     ),
     {
-      provide: API_CONFIGURATION,
+      provide: Configuration,
       useFactory: apiConfigFactory
     }
   ]
