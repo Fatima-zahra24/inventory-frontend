@@ -4,7 +4,10 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { apiConfigFactory } from './core/api.config';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { Configuration } from './api/product';
+import { Configuration as ProductConfiguration } from './api/product';
+import { Configuration as InventoryConfiguration, BASE_PATH as INVENTORY_BASE_PATH } from './api/inventory';
+import { Configuration as SupplierConfiguration, BASE_PATH as SUPPLIER_BASE_PATH } from './api/supplier';
+import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,9 +16,28 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
+    // Product API Configuration
     {
-      provide: Configuration,
+      provide: ProductConfiguration,
       useFactory: apiConfigFactory
+    },
+    // Inventory API Configuration
+    {
+      provide: InventoryConfiguration,
+      useFactory: apiConfigFactory
+    },
+    {
+      provide: INVENTORY_BASE_PATH,
+      useValue: environment.apiGateway
+    },
+    // Supplier API Configuration
+    {
+      provide: SupplierConfiguration,
+      useFactory: apiConfigFactory
+    },
+    {
+      provide: SUPPLIER_BASE_PATH,
+      useValue: environment.apiGateway
     }
   ]
 };

@@ -1,13 +1,14 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ProductFacade } from '../../../api-facade/products/productFacade';
 import { ProductDTO } from '../../../api/product';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="container">
       <header class="header">
@@ -62,7 +63,7 @@ import { ProductDTO } from '../../../api/product';
               </tr>
             </thead>
             <tbody>
-              @for (product of products(); track product.id) {
+              @for (product of paginatedProducts(); track product.id) {
                 <tr>
                   <td class="code">{{ product.code }}</td>
                   <td>
@@ -121,6 +122,81 @@ import { ProductDTO } from '../../../api/product';
               }
             </tbody>
           </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pagination-info">
+              <span>Afficher</span>
+              <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+              <span>par page</span>
+              <span class="separator">|</span>
+              <span>{{ startIndex() + 1 }} - {{ endIndex() }} sur {{ products().length }}</span>
+            </div>
+
+            <div class="pagination-controls">
+              <button
+                class="page-btn"
+                (click)="goToFirstPage()"
+                [disabled]="currentPage() === 1"
+                title="Premiere page"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="11 17 6 12 11 7"/>
+                  <polyline points="18 17 13 12 18 7"/>
+                </svg>
+              </button>
+              <button
+                class="page-btn"
+                (click)="previousPage()"
+                [disabled]="currentPage() === 1"
+                title="Page precedente"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+
+              @for (page of visiblePages(); track page) {
+                @if (page === '...') {
+                  <span class="page-ellipsis">...</span>
+                } @else {
+                  <button
+                    class="page-btn page-number"
+                    [class.active]="currentPage() === page"
+                    (click)="goToPage(+page)"
+                  >
+                    {{ page }}
+                  </button>
+                }
+              }
+
+              <button
+                class="page-btn"
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages()"
+                title="Page suivante"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+              <button
+                class="page-btn"
+                (click)="goToLastPage()"
+                [disabled]="currentPage() === totalPages()"
+                title="Derniere page"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="13 17 18 12 13 7"/>
+                  <polyline points="6 17 11 12 6 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       }
 
@@ -389,6 +465,101 @@ import { ProductDTO } from '../../../api/product';
       background: #fafafa;
     }
 
+    /* Pagination Styles */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid #f3f4f6;
+      background: #f9fafb;
+    }
+
+    .pagination-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .pagination-info select {
+      padding: 6px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .pagination-info select:focus {
+      outline: none;
+      border-color: #4f46e5;
+    }
+
+    .pagination-info .separator {
+      color: #d1d5db;
+      margin: 0 8px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+      color: #374151;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .page-btn.page-number {
+      min-width: 36px;
+      width: auto;
+      padding: 0 12px;
+    }
+
+    .page-btn.active {
+      background: #4f46e5;
+      border-color: #4f46e5;
+      color: white;
+    }
+
+    .page-btn.active:hover {
+      background: #4338ca;
+    }
+
+    .page-ellipsis {
+      padding: 0 8px;
+      color: #9ca3af;
+    }
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -461,6 +632,18 @@ import { ProductDTO } from '../../../api/product';
       background: #fca5a5;
       cursor: not-allowed;
     }
+
+    @media (max-width: 768px) {
+      .pagination {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .pagination-info {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
   `]
 })
 export class ProductListComponent implements OnInit {
@@ -470,6 +653,58 @@ export class ProductListComponent implements OnInit {
   readonly loading = this.productFacade.loading;
   readonly error = this.productFacade.error;
 
+  // Pagination
+  pageSizeOptions = [5, 10, 20, 50];
+  pageSize = 10;
+  private _currentPage = signal(1);
+  currentPage = this._currentPage.asReadonly();
+
+  totalPages = computed(() => Math.ceil(this.products().length / this.pageSize) || 1);
+
+  startIndex = computed(() => (this.currentPage() - 1) * this.pageSize);
+
+  endIndex = computed(() => Math.min(this.startIndex() + this.pageSize, this.products().length));
+
+  paginatedProducts = computed(() => {
+    const start = this.startIndex();
+    const end = start + this.pageSize;
+    return this.products().slice(start, end);
+  });
+
+  visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push('...');
+      }
+
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push('...');
+      }
+
+      pages.push(total);
+    }
+
+    return pages;
+  });
+
+  // Delete modal
   showDeleteModal = false;
   productToDelete: ProductDTO | null = null;
   deleting = false;
@@ -478,6 +713,38 @@ export class ProductListComponent implements OnInit {
     this.productFacade.loadProducts();
   }
 
+  // Pagination methods
+  onPageSizeChange() {
+    this._currentPage.set(1);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this._currentPage.set(page);
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage() > 1) {
+      this._currentPage.update(p => p - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this._currentPage.update(p => p + 1);
+    }
+  }
+
+  goToFirstPage() {
+    this._currentPage.set(1);
+  }
+
+  goToLastPage() {
+    this._currentPage.set(this.totalPages());
+  }
+
+  // Product methods
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
       'ACTIVE': 'Actif',
@@ -515,6 +782,10 @@ export class ProductListComponent implements OnInit {
         this.showDeleteModal = false;
         this.productToDelete = null;
         this.deleting = false;
+        // Adjust current page if needed
+        if (this.currentPage() > this.totalPages()) {
+          this._currentPage.set(Math.max(1, this.totalPages()));
+        }
       },
       error: () => {
         this.deleting = false;

@@ -16,6 +16,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/dashboard.component')
           .then(m => m.DashboardComponent)
       },
+      // Products
       {
         path: 'products',
         loadComponent: () => import('./features/products/product-list/product-list.component')
@@ -30,6 +31,54 @@ export const routes: Routes = [
         path: 'products/:id',
         loadComponent: () => import('./features/products/product-form/product-form.component')
           .then(m => m.ProductFormComponent)
+      },
+      // Categories
+      {
+        path: 'categories',
+        loadComponent: () => import('./features/categories/category-list/category-list.component')
+          .then(m => m.CategoryListComponent)
+      },
+      {
+        path: 'categories/new',
+        loadComponent: () => import('./features/categories/category-form/category-form.component')
+          .then(m => m.CategoryFormComponent)
+      },
+      {
+        path: 'categories/:id',
+        loadComponent: () => import('./features/categories/category-form/category-form.component')
+          .then(m => m.CategoryFormComponent)
+      },
+      // Suppliers
+      {
+        path: 'suppliers',
+        loadComponent: () => import('./features/suppliers/supplier-list/supplier-list.component')
+          .then(m => m.SupplierListComponent)
+      },
+      {
+        path: 'suppliers/new',
+        loadComponent: () => import('./features/suppliers/supplier-form/supplier-form.component')
+          .then(m => m.SupplierFormComponent)
+      },
+      {
+        path: 'suppliers/:id',
+        loadComponent: () => import('./features/suppliers/supplier-form/supplier-form.component')
+          .then(m => m.SupplierFormComponent)
+      },
+      // Inventory
+      {
+        path: 'inventory',
+        loadComponent: () => import('./features/inventory/inventory-list/inventory-list.component')
+          .then(m => m.InventoryListComponent)
+      },
+      {
+        path: 'inventory/movements',
+        loadComponent: () => import('./features/inventory/stock-movement-list/stock-movement-list.component')
+          .then(m => m.StockMovementListComponent)
+      },
+      {
+        path: 'inventory/warehouses',
+        loadComponent: () => import('./features/inventory/warehouse-list/warehouse-list.component')
+          .then(m => m.WarehouseListComponent)
       }
     ]
   },
