@@ -1,13 +1,14 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SupplierFacade } from '../../../api-facade/suppliers/supplierFacade';
 import { SupplierDTO } from '../../../api/supplier';
+import { SupplierProductsDialogComponent } from '../supplier-products-dialog/supplier-products-dialog.component';
 
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SupplierProductsDialogComponent],
   template: `
     <div class="supplier-list">
       <header class="header">
@@ -97,6 +98,11 @@ import { SupplierDTO } from '../../../api/supplier';
                     </span>
                   </td>
                   <td class="actions">
+                    <button class="btn-icon products" (click)="onViewProducts(supplier)" title="Voir les produits">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </button>
                     <a [routerLink]="['/suppliers', supplier.id]" class="btn-icon" title="Modifier">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -202,6 +208,10 @@ import { SupplierDTO } from '../../../api/supplier';
           </div>
         </div>
       }
+
+    @if (showProductsDialog()) {
+      <app-supplier-products-dialog #productsDialog />
+    }
     </div>
   `,
   styles: [`
@@ -491,6 +501,11 @@ import { SupplierDTO } from '../../../api/supplier';
       color: #dc2626;
     }
 
+    .btn-icon.products:hover {
+      background: #e0e7ff;
+      color: #4f46e5;
+    }
+
     .btn-icon svg {
       width: 16px;
       height: 16px;
@@ -573,7 +588,10 @@ import { SupplierDTO } from '../../../api/supplier';
   `]
 })
 export class SupplierListComponent implements OnInit {
+  @ViewChild('productsDialog') productsDialog!: SupplierProductsDialogComponent;
+
   facade = inject(SupplierFacade);
+  showProductsDialog = signal(false);
 
   // Pagination
   pageSizeOptions = [10, 20, 50, 100];
@@ -679,5 +697,16 @@ export class SupplierListComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     this.pageSize = parseInt(select.value, 10);
     this._currentPage.set(1);
+  }
+
+  onViewProducts(supplier: SupplierDTO) {
+    if (supplier.id) {
+      this.showProductsDialog.set(true);
+      setTimeout(() => {
+        this.productsDialog.open(supplier.id!, supplier.name, () => {
+          this.showProductsDialog.set(false);
+        });
+      });
+    }
   }
 }

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { StockMovementFacade } from '../../../api-facade/inventory/stockMovementFacade';
 import { WarehouseFacade } from '../../../api-facade/inventory/warehouseFacade';
 import { StockMovementDTO, StockMovementCreateDTO } from '../../../api/inventory';
+import {ProductFacade} from '../../../api-facade/products/productFacade';
 
 @Component({
   selector: 'app-stock-movement-list',
@@ -195,7 +196,12 @@ import { StockMovementDTO, StockMovementCreateDTO } from '../../../api/inventory
 
             <div class="form-group">
               <label>Produit ID *</label>
-              <input type="number" [(ngModel)]="newMovement.productId" class="form-control" placeholder="ID du produit">
+              <select [(ngModel)]="newMovement.productId" class="form-control">
+                <option [value]="0">Selectionnez...</option>
+                @for (product of productFacade.products(); track product.id) {
+                  <option [value]="product.id">{{ product.code }}</option>
+                }
+              </select>
             </div>
 
             <div class="form-group">
@@ -694,6 +700,8 @@ export class StockMovementListComponent implements OnInit {
   facade = inject(StockMovementFacade);
   warehouseFacade = inject(WarehouseFacade);
 
+  productFacade = inject(ProductFacade);
+
   searchTerm = '';
   selectedType = '';
   selectedWarehouse = '';
@@ -756,6 +764,7 @@ export class StockMovementListComponent implements OnInit {
   ngOnInit() {
     this.facade.loadMovements();
     this.warehouseFacade.loadWarehouses();
+    this.productFacade.loadProducts();
   }
 
   onTypeChange() {

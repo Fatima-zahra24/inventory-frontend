@@ -103,4 +103,14 @@ export class ProductFacade {
       })
     );
   }
+
+  getProductsBySupplier(supplierId: number): Observable<ProductDTO[]> {
+    return this.api.getProductsBySupplier(supplierId).pipe(
+      map((res: any) => res?.data ?? []),
+      catchError(err => {
+        console.error('Failed to load products by supplier', err);
+        return throwError(() => new Error(err.error?.message || 'Erreur lors du chargement des produits du fournisseur'));
+      })
+    );
+  }
 }

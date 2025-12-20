@@ -5,7 +5,8 @@ import {
   InventoryDTO,
   InventoryCreateDTO,
   InventoryUpdateDTO,
-  StockAlertDTO
+  StockAlertDTO,
+  InventoryStatsDTO
 } from '../../api/inventory';
 
 @Injectable({ providedIn: 'root' })
@@ -13,11 +14,13 @@ export class InventoryFacade {
 
   private readonly _inventories = signal<InventoryDTO[]>([]);
   private readonly _alerts = signal<StockAlertDTO[]>([]);
+  private readonly _stats = signal<InventoryStatsDTO | null>(null);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
   readonly inventories = this._inventories.asReadonly();
   readonly alerts = this._alerts.asReadonly();
+  readonly stats = this._stats.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -48,6 +51,17 @@ export class InventoryFacade {
       },
       error: err => {
         console.error('Failed to load alerts', err);
+      }
+    });
+  }
+
+  loadStats() {
+    this.api.getInventoryStats().subscribe({
+      next: (res: any) => {
+        this._stats.set(res?.data ?? null);
+      },
+      error: err => {
+        console.error('Failed to load inventory stats', err);
       }
     });
   }
