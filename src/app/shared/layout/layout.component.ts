@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -56,6 +57,27 @@ import { RouterModule } from '@angular/router';
             <span>Fournisseurs</span>
           </a>
         </nav>
+
+        <div class="sidebar-footer">
+          @if (currentUser) {
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ currentUser.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="user-details">
+                <span class="user-name">{{ currentUser.username }}</span>
+                <span class="user-role">{{ isAdmin ? 'Administrateur' : 'Utilisateur' }}</span>
+              </div>
+            </div>
+            <button class="logout-btn" (click)="logout()" title="Deconnexion">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          }
+        </div>
       </aside>
 
       <main class="main-content">
@@ -143,6 +165,93 @@ import { RouterModule } from '@angular/router';
       background: #f5f7fa;
       min-height: 100vh;
     }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #4f46e5;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-weight: 500;
+      color: white;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .logout-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logout-btn:hover {
+      background: #ef4444;
+    }
+
+    .logout-btn .icon {
+      color: white;
+    }
   `]
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+  private readonly authService = inject(AuthService);
+
+  get currentUser() {
+    return this.authService.getCurrentUser();
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+}

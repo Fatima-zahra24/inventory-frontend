@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductFacade } from '../../api-facade/products/productFacade';
+import { IsAdminDirective } from '../../shared/directives/has-role.directive';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, IsAdminDirective],
   template: `
     <div class="dashboard">
       <header class="header">
@@ -14,7 +15,7 @@ import { ProductFacade } from '../../api-facade/products/productFacade';
         <p class="subtitle">Vue d'ensemble de votre inventaire</p>
       </header>
 
-      <div class="stats-grid">
+      <div class="stats-grid" *appIsAdmin>
         <div class="stat-card">
           <div class="stat-icon products">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
