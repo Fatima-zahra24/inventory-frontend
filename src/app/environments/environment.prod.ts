@@ -5,6 +5,7 @@ export const environment = {
     product: 'https://your-production-domain.com/api/products',
     inventory: 'https://your-production-domain.com/api/inventories',
     supplier: 'https://your-production-domain.com/api/suppliers',
-    notification: 'https://your-production-domain.com/api/notifications'
+    notification: 'https://your-production-domain.com/api/notifications',
+    order: 'https://your-production-domain.com/api/orders'
   }
 };

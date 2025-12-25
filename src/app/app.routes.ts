@@ -89,6 +89,32 @@ export const routes: Routes = [
         path: 'inventory/warehouses',
         loadComponent: () => import('./features/inventory/warehouse-list/warehouse-list.component')
           .then(m => m.WarehouseListComponent)
+      },
+      {
+        path: 'inventory/warehouses/:id/inventory',
+        loadComponent: () => import('./features/inventory/warehouse-inventory/warehouse-inventory.component')
+          .then(m => m.WarehouseInventoryComponent)
+      },
+      // Orders
+      {
+        path: 'orders',
+        loadComponent: () => import('./features/orders/order-list/order-list.component')
+          .then(m => m.OrderListComponent)
+      },
+      {
+        path: 'orders/new',
+        loadComponent: () => import('./features/orders/order-create/order-create.component')
+          .then(m => m.OrderCreateComponent)
+      },
+      {
+        path: 'orders/:id',
+        loadComponent: () => import('./features/orders/order-details/order-details.component')
+          .then(m => m.OrderDetailsComponent)
+      },
+      {
+        path: 'orders/:id/edit',
+        loadComponent: () => import('./features/orders/order-edit/order-edit.component')
+          .then(m => m.OrderEditComponent)
       }
     ]
   },
